@@ -56,11 +56,123 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	_reactDom2.default.render(_react2.default.createElement(
-	  'h1',
-	  null,
-	  'Hello, world!'
-	), document.getElementById('root'));
+	var Comment = _react2.default.createClass({
+		displayName: 'Comment',
+
+		getInitialState: function getInitialState() {
+			return { editing: false };
+		},
+
+		edit: function edit() {
+			this.setState({ editing: true });
+		},
+		remove: function remove() {
+			this.props.deleteFromBoard(this.props.index);
+		},
+		save: function save() {
+			this.props.updateCommentText(this.refs.newText.value, this.props.index);
+			this.setState({ editing: false });
+		},
+
+		renderNormal: function renderNormal() {
+			return _react2.default.createElement(
+				'div',
+				{ className: 'commentContainer' },
+				_react2.default.createElement(
+					'div',
+					{ className: 'commentText' },
+					this.props.children
+				),
+				_react2.default.createElement(
+					'button',
+					{ onClick: this.edit, className: 'button-primary' },
+					'Edit'
+				),
+				_react2.default.createElement(
+					'button',
+					{ onClick: this.remove, className: 'button-danger' },
+					'Remove'
+				)
+			);
+		},
+
+		renderForm: function renderForm() {
+			return _react2.default.createElement(
+				'div',
+				{ className: 'commentContainer' },
+				_react2.default.createElement('textarea', { ref: 'newText', defaultValue: this.props.children }),
+				_react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'button',
+						{ onClick: this.save, className: 'button-success' },
+						'Save'
+					)
+				)
+			);
+		},
+
+		render: function render() {
+			if (this.state.editing) {
+				return this.renderForm();
+			} else {
+				return this.renderNormal();
+			}
+		}
+	});
+
+	var Board = _react2.default.createClass({
+		displayName: 'Board',
+
+
+		getInitialState: function getInitialState() {
+			return {
+				comments: []
+			};
+		},
+		add: function add(text) {
+			var arr = this.state.comments;
+			arr.push(text);
+			this.setState({ comments: arr });
+		},
+		removeComment: function removeComment(i) {
+			var arr = this.state.comments;
+			arr.splice(i, 1);
+			this.setState({ comments: arr });
+		},
+		updateComment: function updateComment(newText, i) {
+			var arr = this.state.comments;
+			arr[i] = newText;
+			this.setState({ comments: arr });
+		},
+		eachComment: function eachComment(text, i) {
+			return _react2.default.createElement(
+				Comment,
+				{ key: i, index: i, updateCommentText: this.updateComment, deleteFromBoard: this.removeComment },
+				text
+			);
+		},
+		render: function render() {
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'button',
+					{ onClick: this.add.bind(null, 'New Comment'), className: 'button-info create' },
+					'Add New'
+				),
+				_react2.default.createElement(
+					'div',
+					{ className: 'board' },
+					this.state.comments.map(this.eachComment)
+				)
+			);
+		}
+
+	});
+
+	_reactDom2.default.render(_react2.default.createElement(Board, null), document.getElementById('root'));
 
 /***/ },
 /* 1 */
